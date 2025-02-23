@@ -20,4 +20,25 @@ model User {
   username  String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  rooms      Room[]
+  chat       Chat[]
+}
+
+
+model Room {
+  id         Int      @id @default(autoincrement())
+  slug       String   @unique
+  createdAt  DateTime @default(now())
+  adminId    String 
+  admin      User     @relation(fields: [adminId],references: [id])
+  chats      Chat[]
+}
+model Chat {
+  id          Int     @id @default(autoincrement())
+  userId      String  
+  message     String
+  roomId      Int
+  room         Room    @relation(fields: [roomId],references: [id])
+  user         User    @relation(fields: [userId],references: [id])
+
 }

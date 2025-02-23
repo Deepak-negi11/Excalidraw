@@ -1,9 +1,13 @@
 import prisma from "@repo/db";
 import { JWT_SECRET } from "@repo/secure";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import { WebSocketServer } from "ws";
 
 const wss = new WebSocketServer({ port: 8080 });
+
+function isJwtPayload(decoded: string | JwtPayload): decoded is JwtPayload {
+    return typeof decoded === "object" && "id" in decoded;
+}
 
 wss.on("connection", async (ws , request) => {
     const url = request.url;
@@ -18,7 +22,7 @@ wss.on("connection", async (ws , request) => {
         return;
     }
     const decoded = jwt.verify(token, JWT_SECRET);
-    if(!decoded){
+    if (!isJwtPayload(decoded)) {
         ws.close();
         return;
     }
